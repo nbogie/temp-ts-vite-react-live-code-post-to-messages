@@ -7,8 +7,10 @@ function App() {
 }
 
 export default App;
+const apiBaseURL = "https://live-coded-api-july-2024.glitch.me";
 
 function ChatApp() {
+    const [messages, setMessages] = useState([] as Message[]);
     const [text, setText] = useState("");
     const [author, setAuthor] = useState("");
 
@@ -16,12 +18,17 @@ function ChatApp() {
         text: string;
         author: string;
     }
-    async function sendMessage() {
+
+    async function handleGetAllMessages() {
+        const reply = await axios.get(apiBaseURL + "/messages");
+        setMessages(reply.data);
+    }
+
+    async function handleSendMessage() {
         const message: Message = {
             author,
             text,
         };
-        const apiBaseURL = "https://live-coded-api-july-2024.glitch.me";
 
         const reply = await axios.post(apiBaseURL + "/messages", message);
         if (reply.status === 200) {
@@ -43,7 +50,16 @@ function ChatApp() {
             <hr />
             <div>text: {text}</div>
             <div>author: {author}</div>
-            <button onClick={sendMessage}>Send</button>
+            <button onClick={handleSendMessage}>Send</button>
+            <button onClick={handleGetAllMessages}>get all messages</button>
+            <div>
+                {messages.map((m) => (
+                    <div className="message">
+                        <div>{m.author}</div>
+                        <div>{m.text}</div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
