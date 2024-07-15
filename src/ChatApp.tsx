@@ -1,17 +1,18 @@
 import axios from "axios";
 import { useState } from "react";
+import { MessageView } from "./MessageView";
 
 const apiBaseURL = "https://live-coded-api-july-2024.glitch.me";
+
+export interface Message {
+    text: string;
+    author: string;
+}
 
 export function ChatApp() {
     const [messages, setMessages] = useState([] as Message[]);
     const [text, setText] = useState("");
     const [author, setAuthor] = useState("");
-
-    interface Message {
-        text: string;
-        author: string;
-    }
 
     async function handleGetAllMessages() {
         const reply = await axios.get(apiBaseURL + "/messages");
@@ -29,8 +30,8 @@ export function ChatApp() {
             setAuthor("");
             setText("");
         } else {
-            console.error("Failed to send message");
-            alert("ERROR: see logs");
+            console.error(`Failed to send message - status ${reply.status}`);
+            alert(`ERROR ${reply.status}: see logs`);
         }
     }
     return (
@@ -46,12 +47,9 @@ export function ChatApp() {
             <div>author: {author}</div>
             <button onClick={handleSendMessage}>Send</button>
             <button onClick={handleGetAllMessages}>get all messages</button>
-            <div>
-                {messages.map((m) => (
-                    <div className="message">
-                        <div>{m.author}</div>
-                        <div>{m.text}</div>
-                    </div>
+            <div className="messageList">
+                {messages.map((m, index) => (
+                    <MessageView key={index} message={m} />
                 ))}
             </div>
         </div>
